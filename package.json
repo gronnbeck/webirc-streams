@@ -6,6 +6,7 @@
 	"author": "Ken Grønnbeck <kengroenn@gmail.com>",
 	"license": "MIT",
 	"dependencies": {
-		"ws": "latest"
+		"ws": "latest",
+    "underscore": "latest"
 	}
 }
