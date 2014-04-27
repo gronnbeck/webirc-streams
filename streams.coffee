@@ -22,22 +22,25 @@ wss.on('connection', (ws) ->
   parse = (payload) ->
       JSON.parse(payload)
 
+  identifyListener = (payload) ->
+    message = parse(payload)
+
+    if message.type == 'identify'
+      ws.removeListener('message', identifyListener)
+      ws.on('message', setupApi)
+
+      send(_.extend(message, { success: true }))
+
+  setupApi = (payload) ->
+    message = parse(payload)
+    log(message)
+    if message.type == 'identify'
+      send(errors.alreadyIdentified)
+
   listeners =
     open: () ->
       log('Connection opened')
-    message: (payload) ->
-      message = parse(payload)
-
-      if message.type == 'identify'
-        ws.removeListener('message', listeners.message)
-        ws.on('message', (payload) ->
-          message = parse(payload)
-          log(message)
-          if message.type == 'identify'
-            send(errors.alreadyIdentified))
-
-        send(_.extend(message, { success: true }))
-
+    message: identifyListener
     close: () ->
       log('connection closed')
 
