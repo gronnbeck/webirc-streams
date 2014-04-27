@@ -1,0 +1,11 @@
+{
+	"name": "webirc-streams",
+	"version": "0.0.0",
+  "main": "stream.coffee",
+	"description": "WebSocket API for irc2ws-proxy",
+	"author": "Ken Grønnbeck <kengroenn@gmail.com>",
+	"license": "MIT",
+	"dependencies": {
+		"ws": "latest"
+	}
+}
