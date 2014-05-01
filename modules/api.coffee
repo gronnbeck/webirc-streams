@@ -16,6 +16,8 @@ API = (ws) ->
         send(_.extend(message, { success: true }))
         send(user)
       )
+    error: (error) ->
+      send(_.extend(error, { success: false, type: 'error' }))
 
   return api
 

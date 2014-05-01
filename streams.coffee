@@ -2,6 +2,7 @@ WebSocket = require 'ws'
 WebSocketServer = WebSocket.Server
 log = console.log
 API = require './modules/api'
+_ = require 'underscore'
 
 wss = new WebSocketServer({ port: 9001 })
 
@@ -11,15 +12,23 @@ wss.on('connection', (ws) ->
   handlerForType = (type) ->
     return api[type]
 
+  hasHandlerForType = (type) ->
+    return _.has(api, type)
+
   parse = (payload) ->
       JSON.parse(payload)
 
   apiListener = (payload) ->
     message = parse(payload)
+    type = message.type
 
-    handle = handlerForType(message.type)
-    handle(message)
-
+    if hasHandlerForType(type)
+      handle = handlerForType(type)
+      handle(message)
+    else
+      handle = handlerForType('error')
+      error = { error: 'No handler for type \'' + type  + '\''}
+      handle(error)
 
   listeners =
     open: () ->
