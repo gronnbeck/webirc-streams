@@ -2,7 +2,7 @@ WebSocket = require 'ws'
 WebSocketServer = WebSocket.Server
 _ = require 'underscore'
 log = console.log
-Db = require './modules/Db'
+db = require './modules/db'
 
 errors =
   alreadyIdentified:
@@ -27,9 +27,7 @@ wss.on('connection', (ws) ->
     message = parse(payload)
 
     if message.type == 'identify'
-      Db.user.auth(message.id, message.hash, (err, user) ->
-        bindSetupApi(ws)
-
+      db.user.auth(message.id, message.hash, (err, user) ->
         send(_.extend(message, { success: true }))
         send(user)
       )
