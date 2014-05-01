@@ -4,9 +4,7 @@ _ = require 'underscore'
 log = console.log
 db = require './modules/db'
 
-wss = new WebSocketServer({ port: 9001 })
-
-wss.on('connection', (ws) ->
+API = (ws) ->
 
   send = (message) ->
     payload = JSON.stringify(message)
@@ -15,17 +13,33 @@ wss.on('connection', (ws) ->
   sendPayload = (payload) ->
     ws.send(payload)
 
+  api =
+    identify: (message) ->
+      db.user.auth(message.id, message.hash, (err, user) ->
+        send(_.extend(message, { success: true }))
+        send(user)
+      )
+
+  return api
+
+
+wss = new WebSocketServer({ port: 9001 })
+
+wss.on('connection', (ws) ->
+
+  api = API(ws)
+  handlerForType = (type) ->
+    return api[type]
+
   parse = (payload) ->
       JSON.parse(payload)
 
   apiListener = (payload) ->
     message = parse(payload)
 
-    if message.type == 'identify'
-      db.user.auth(message.id, message.hash, (err, user) ->
-        send(_.extend(message, { success: true }))
-        send(user)
-      )
+    handle = handlerForType(message.type)
+    handle(message)
+
 
   listeners =
     open: () ->
