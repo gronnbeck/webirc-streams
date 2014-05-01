@@ -4,11 +4,6 @@ _ = require 'underscore'
 log = console.log
 db = require './modules/db'
 
-errors =
-  alreadyIdentified:
-    success: false
-    error: 'This socket has already been identified.'
-
 wss = new WebSocketServer({ port: 9001 })
 
 wss.on('connection', (ws) ->
@@ -23,7 +18,7 @@ wss.on('connection', (ws) ->
   parse = (payload) ->
       JSON.parse(payload)
 
-  identifyListener = (payload) ->
+  apiListener = (payload) ->
     message = parse(payload)
 
     if message.type == 'identify'
@@ -32,20 +27,10 @@ wss.on('connection', (ws) ->
         send(user)
       )
 
-  setupApi = (payload) ->
-    message = parse(payload)
-    log(message)
-    if message.type == 'identify'
-      send(errors.alreadyIdentified)
-
-  bindSetupApi = (ws) ->
-    ws.removeListener('message', identifyListener)
-    ws.on('message', setupApi)
-
   listeners =
     open: () ->
       log('Connection opened')
-    message: identifyListener
+    message: apiListener
     close: () ->
       log('connection closed')
 
