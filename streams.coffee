@@ -1,27 +1,7 @@
 WebSocket = require 'ws'
 WebSocketServer = WebSocket.Server
-_ = require 'underscore'
 log = console.log
-db = require './modules/db'
-
-API = (ws) ->
-
-  send = (message) ->
-    payload = JSON.stringify(message)
-    ws.send(payload)
-
-  sendPayload = (payload) ->
-    ws.send(payload)
-
-  api =
-    identify: (message) ->
-      db.user.auth(message.id, message.hash, (err, user) ->
-        send(_.extend(message, { success: true }))
-        send(user)
-      )
-
-  return api
-
+API = require './modules/api'
 
 wss = new WebSocketServer({ port: 9001 })
 
